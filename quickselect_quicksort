@@ -1,0 +1,53 @@
+import random
+import time
+
+def quickselect(arr, k):
+    def partition(low, high):
+        pivot = arr[high]
+        i = low
+        for j in range(low, high):
+            if arr[j] < pivot:
+                arr[i], arr[j] = arr[j], arr[i]
+                i += 1
+        arr[i], arr[high] = arr[high], arr[i]
+        return i
+    def select(low, high, k):
+        if low == high:
+            return arr[low]
+        pivot_index = random.randint(low, high)
+        arr[pivot_index], arr[high] = arr[high], arr[pivot_index]
+        pi = partition(low, high)
+        if k == pi:
+            return arr[pi]
+        elif k < pi:
+            return select(low, pi - 1, k)
+        else:
+            return select(pi + 1, high, k)
+    return select(0, len(arr) - 1, k)
+
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[random.randint(0, len(arr) - 1)]
+    less = [x for x in arr if x < pivot]
+    equal = [x for x in arr if x == pivot]
+    greater = [x for x in arr if x > pivot]
+    return quicksort(less) + equal + quicksort(greater)
+
+if __name__ == "main":
+    sizes = [10_000_000, 20_000_000, 40_000_000, 80_000_000, 160_000_000] 
+    for n in sizes:
+        data = [random.randint(0, n) for _ in range(n)]
+        k_values = [random.randint(0, n - 1) for _ in range(100)]
+        
+        start = time.time() # for quickselect
+        for k in k_values:
+            quickselect(data[:], k)
+        qs_time = (time.time() - start) / 100
+
+        start = time.time() # for quicksort
+        for _ in range(100):
+            quicksort(data[:])
+        sort_time = (time.time() - start) / 100
+
+        print(f"n = {n}: QuickSelect = {qs_time:.4f}s, Quicksort = {sort_time:.4f}s")
